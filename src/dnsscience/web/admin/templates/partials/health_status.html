@@ -1,0 +1,49 @@
+<table>
+    <tr>
+        <td>Health State</td>
+        <td class="status-{{ health.state.value }}">
+            <strong>{{ health.state.value | upper }}</strong>
+        </td>
+    </tr>
+    <tr>
+        <td>Service</td>
+        <td class="status-{{ health.service_status.state.value }}">
+            {{ health.service_status.state.value }}
+        </td>
+    </tr>
+    {% if health.cache_stats %}
+    <tr>
+        <td>Cache Size</td>
+        <td>{{ health.cache_stats.size }} entries</td>
+    </tr>
+    <tr>
+        <td>Hit Ratio</td>
+        <td>{{ "%.1f"|format(health.cache_stats.hit_ratio * 100) }}%</td>
+    </tr>
+    {% endif %}
+    {% if health.query_rate is not none %}
+    <tr>
+        <td>Query Rate</td>
+        <td>{{ "%.2f"|format(health.query_rate) }} qps</td>
+    </tr>
+    {% endif %}
+    {% if health.latency_avg_ms is not none %}
+    <tr>
+        <td>Avg Latency</td>
+        <td>{{ "%.2f"|format(health.latency_avg_ms) }}ms</td>
+    </tr>
+    {% endif %}
+</table>
+
+{% if health.upstreams %}
+<h4>Upstream Resolvers</h4>
+<ul>
+    {% for upstream in health.upstreams %}
+    <li>
+        {% if upstream.healthy %}✓{% else %}✗{% endif %}
+        {{ upstream.address }}:{{ upstream.port }}
+        {% if upstream.latency_ms %}({{ "%.2f"|format(upstream.latency_ms) }}ms){% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}

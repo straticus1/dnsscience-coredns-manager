@@ -1,0 +1,36 @@
+{% if response.rcode == 'NOERROR' and response.records %}
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>TTL</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in response.records %}
+        <tr>
+            <td>{{ record.name }}</td>
+            <td>{{ record.record_type.value }}</td>
+            <td>{{ record.ttl }}s</td>
+            <td><code>{{ record.value }}</code></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% elif response.rcode == 'NOERROR' %}
+<div class="alert alert-warning">No records found</div>
+{% else %}
+<div class="alert alert-error">
+    Query failed: {{ response.rcode }}
+</div>
+{% endif %}
+
+<p class="muted">
+    Server: {{ response.server }} |
+    Time: {{ "%.2f"|format(response.query_time_ms) }}ms
+    {% if response.dnssec_valid is not none %}
+    | DNSSEC: {% if response.dnssec_valid %}Valid{% else %}Invalid{% endif %}
+    {% endif %}
+</p>

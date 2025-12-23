@@ -1,0 +1,24 @@
+apiVersion: v2
+name: dnsscience
+description: DNS Science Toolkit - Comprehensive DNS management for CoreDNS and Unbound
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+keywords:
+  - dns
+  - coredns
+  - unbound
+  - kubernetes
+  - migration
+  - observability
+
+home: https://github.com/afterdarksystems/dnsscience-toolkit
+sources:
+  - https://github.com/afterdarksystems/dnsscience-toolkit
+
+maintainers:
+  - name: After Dark Systems
+    email: support@afterdarksystems.com
+
+dependencies: []

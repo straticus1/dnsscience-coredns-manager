@@ -1,0 +1,30 @@
+<table>
+    <tr>
+        <td>Entries</td>
+        <td><span class="stat-value">{{ stats.size }}</span></td>
+    </tr>
+    <tr>
+        <td>Hits</td>
+        <td>{{ "{:,}".format(stats.hits) }}</td>
+    </tr>
+    <tr>
+        <td>Misses</td>
+        <td>{{ "{:,}".format(stats.misses) }}</td>
+    </tr>
+    <tr>
+        <td>Hit Ratio</td>
+        <td>
+            <strong>{{ "%.1f"|format(stats.hit_ratio * 100) }}%</strong>
+        </td>
+    </tr>
+    {% if stats.evictions %}
+    <tr>
+        <td>Evictions</td>
+        <td>{{ "{:,}".format(stats.evictions) }}</td>
+    </tr>
+    {% endif %}
+</table>
+
+{% if message %}
+<div class="alert alert-success">{{ message }}</div>
+{% endif %}

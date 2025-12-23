@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Configuration - DNS Science Admin{% endblock %}
+
+{% block content %}
+<h1>Configuration</h1>
+
+<div class="resolver-tabs">
+    <button class="resolver-tab active" onclick="setResolver('coredns')">CoreDNS</button>
+    <button class="resolver-tab" onclick="setResolver('unbound')">Unbound</button>
+</div>
+
+<div class="grid-2">
+    <!-- Current Config -->
+    <article class="card">
+        <h3>Current Configuration</h3>
+        <div
+            hx-get="/htmx/config/show?resolver=coredns"
+            hx-trigger="load, resolver-changed from:body"
+        >
+            <p class="htmx-indicator">Loading...</p>
+        </div>
+    </article>
+
+    <!-- Validate Config -->
+    <article class="card">
+        <h3>Validate Configuration</h3>
+        <form hx-post="/htmx/config/validate" hx-target="#validation-result">
+            <input type="hidden" name="resolver" value="coredns">
+
+            <label for="config">Configuration to Validate</label>
+            <textarea id="config" name="config" rows="12" placeholder="Paste configuration here..."></textarea>
+
+            <button type="submit">Validate</button>
+        </form>
+        <div id="validation-result" style="margin-top: 1rem;"></div>
+    </article>
+</div>
+{% endblock %}

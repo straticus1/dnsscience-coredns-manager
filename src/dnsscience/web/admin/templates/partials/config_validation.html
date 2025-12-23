@@ -1,0 +1,33 @@
+{% if result.valid %}
+<div class="alert alert-success">
+    ✓ Configuration is valid
+</div>
+{% else %}
+<div class="alert alert-error">
+    ✗ Configuration has errors
+</div>
+
+{% if result.errors %}
+<h4>Errors</h4>
+<ul>
+    {% for error in result.errors %}
+    <li>
+        {% if error.line %}Line {{ error.line }}: {% endif %}
+        {{ error.message }}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endif %}
+
+{% if result.warnings %}
+<h4>Warnings</h4>
+<ul>
+    {% for warning in result.warnings %}
+    <li class="muted">
+        {% if warning.line %}Line {{ warning.line }}: {% endif %}
+        {{ warning.message }}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}

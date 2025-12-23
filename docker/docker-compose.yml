@@ -1,0 +1,150 @@
+# DNS Science Toolkit - Docker Compose Configuration
+# For local development and testing
+
+version: "3.9"
+
+services:
+  # ==========================================================================
+  # Main API Server
+  # ==========================================================================
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: api
+    image: dnsscience-toolkit:api
+    container_name: dnsscience-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DNSSCIENCE_RESOLVER=coredns
+      - DNSSCIENCE_COREDNS_HOST=coredns
+      - DNSSCIENCE_COREDNS_PORT=53
+      - DNSSCIENCE_UNBOUND_HOST=unbound
+      - DNSSCIENCE_UNBOUND_PORT=53
+      - DNSSCIENCE_LOG_LEVEL=INFO
+    depends_on:
+      - coredns
+      - unbound
+    networks:
+      - dnsscience
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Admin Panel (htmx)
+  # ==========================================================================
+  admin:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: admin
+    image: dnsscience-toolkit:admin
+    container_name: dnsscience-admin
+    ports:
+      - "8001:8001"
+    environment:
+      - DNSSCIENCE_API_URL=http://api:8000
+      - DNSSCIENCE_LOG_LEVEL=INFO
+    depends_on:
+      - api
+    networks:
+      - dnsscience
+    restart: unless-stopped
+
+  # ==========================================================================
+  # CoreDNS Instance
+  # ==========================================================================
+  coredns:
+    image: coredns/coredns:1.11.1
+    container_name: dnsscience-coredns
+    ports:
+      - "5353:53/udp"
+      - "5353:53/tcp"
+      - "9153:9153"  # Prometheus metrics
+    volumes:
+      - ./coredns/Corefile:/etc/coredns/Corefile:ro
+    command: ["-conf", "/etc/coredns/Corefile"]
+    networks:
+      - dnsscience
+    healthcheck:
+      test: ["CMD", "dig", "@localhost", "health.check", "CH", "TXT"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Unbound Instance
+  # ==========================================================================
+  unbound:
+    image: mvance/unbound:1.19.0
+    container_name: dnsscience-unbound
+    ports:
+      - "5354:53/udp"
+      - "5354:53/tcp"
+      - "8953:8953"  # Control port
+    volumes:
+      - ./unbound/unbound.conf:/opt/unbound/etc/unbound/unbound.conf:ro
+    networks:
+      - dnsscience
+    healthcheck:
+      test: ["CMD", "drill", "@localhost", "health.check"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Prometheus (optional - for metrics)
+  # ==========================================================================
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: dnsscience-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    networks:
+      - dnsscience
+    profiles:
+      - monitoring
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Grafana (optional - for dashboards)
+  # ==========================================================================
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: dnsscience-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - dnsscience
+    profiles:
+      - monitoring
+    restart: unless-stopped
+
+networks:
+  dnsscience:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+  grafana_data:

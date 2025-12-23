@@ -1,0 +1,144 @@
+{{- if .Values.operator.enabled }}
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: dnsmigrations.dnsscience.io
+  labels:
+    {{- include "dnsscience.labels" . | nindent 4 }}
+spec:
+  group: dnsscience.io
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - source
+                - target
+                - config
+              properties:
+                source:
+                  type: string
+                  enum: [coredns, unbound]
+                  description: Source DNS resolver type
+                target:
+                  type: string
+                  enum: [coredns, unbound]
+                  description: Target DNS resolver type
+                config:
+                  type: string
+                  description: Source configuration to migrate
+                validateBefore:
+                  type: boolean
+                  default: true
+                  description: Validate configuration before migration
+                testDomains:
+                  type: array
+                  items:
+                    type: string
+                  description: Domains to test after migration
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                  enum: [Pending, Validating, Migrating, Completed, Failed, RolledBack]
+                message:
+                  type: string
+                lastUpdated:
+                  type: string
+                backup:
+                  type: string
+                  description: Backup of original configuration
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Source
+          type: string
+          jsonPath: .spec.source
+        - name: Target
+          type: string
+          jsonPath: .spec.target
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+  scope: Namespaced
+  names:
+    plural: dnsmigrations
+    singular: dnsmigration
+    kind: DNSMigration
+    shortNames:
+      - dnsm
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: dnsconfigs.dnsscience.io
+  labels:
+    {{- include "dnsscience.labels" . | nindent 4 }}
+spec:
+  group: dnsscience.io
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - resolver
+                - config
+              properties:
+                resolver:
+                  type: string
+                  enum: [coredns, unbound]
+                  description: DNS resolver type
+                config:
+                  type: string
+                  description: DNS resolver configuration
+                validateOnApply:
+                  type: boolean
+                  default: true
+                  description: Validate before applying
+            status:
+              type: object
+              properties:
+                valid:
+                  type: boolean
+                lastApplied:
+                  type: string
+                errors:
+                  type: array
+                  items:
+                    type: string
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Resolver
+          type: string
+          jsonPath: .spec.resolver
+        - name: Valid
+          type: boolean
+          jsonPath: .status.valid
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+  scope: Namespaced
+  names:
+    plural: dnsconfigs
+    singular: dnsconfig
+    kind: DNSConfig
+    shortNames:
+      - dnsc
+{{- end }}

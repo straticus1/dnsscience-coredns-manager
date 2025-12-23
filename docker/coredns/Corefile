@@ -1,0 +1,57 @@
+# CoreDNS Configuration for DNS Science Toolkit
+# Development/Testing Configuration
+
+.:53 {
+    # Error logging
+    errors
+
+    # Health endpoint for k8s probes
+    health {
+        lameduck 5s
+    }
+
+    # Readiness probe
+    ready
+
+    # Prometheus metrics on :9153
+    prometheus :9153
+
+    # Forward all queries to upstream DNS
+    forward . 8.8.8.8 8.8.4.4 1.1.1.1 {
+        max_concurrent 1000
+        policy round_robin
+    }
+
+    # DNS cache
+    cache 300 {
+        success 9984 300
+        denial 9984 30
+        prefetch 10 10s
+    }
+
+    # Loop detection
+    loop
+
+    # Hot reload on config changes
+    reload 10s
+
+    # Load balancing for responses
+    loadbalance round_robin
+
+    # Logging (verbose for development)
+    log . {
+        class denial error
+    }
+}
+
+# Internal health check zone
+health.check:53 {
+    chaos CoreDNS-1 info@coredns.io
+}
+
+# Example internal zone (uncomment to use)
+# internal.local:53 {
+#     file /etc/coredns/internal.db
+#     errors
+#     log
+# }

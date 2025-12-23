@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - DNS Science Admin{% endblock %}
+
+{% block content %}
+<h1>DNS Science Dashboard</h1>
+
+<div class="resolver-tabs">
+    <button class="resolver-tab active" onclick="setResolver('coredns')">CoreDNS</button>
+    <button class="resolver-tab" onclick="setResolver('unbound')">Unbound</button>
+</div>
+
+<div class="grid-3">
+    <!-- Service Status -->
+    <article class="card">
+        <h3>Service Status</h3>
+        <div
+            hx-get="/htmx/service/status?resolver=coredns"
+            hx-trigger="load, every 10s, resolver-changed from:body"
+        >
+            <p class="htmx-indicator">Loading...</p>
+        </div>
+    </article>
+
+    <!-- Health Status -->
+    <article class="card">
+        <h3>Health</h3>
+        <div
+            hx-get="/htmx/health/check?resolver=coredns"
+            hx-trigger="load, every 10s, resolver-changed from:body"
+        >
+            <p class="htmx-indicator">Loading...</p>
+        </div>
+    </article>
+
+    <!-- Cache Stats -->
+    <article class="card">
+        <h3>Cache</h3>
+        <div
+            hx-get="/htmx/cache/stats?resolver=coredns"
+            hx-trigger="load, every 10s, resolver-changed from:body"
+        >
+            <p class="htmx-indicator">Loading...</p>
+        </div>
+    </article>
+</div>
+
+<div class="grid-2" style="margin-top: 1rem;">
+    <!-- Quick Query -->
+    <article class="card">
+        <h3>Quick DNS Lookup</h3>
+        <form hx-post="/htmx/query/lookup" hx-target="#query-result">
+            <input type="hidden" name="resolver" value="coredns">
+            <div class="grid-2">
+                <input type="text" name="domain" placeholder="example.com" required>
+                <select name="record_type">
+                    <option value="A">A</option>
+                    <option value="AAAA">AAAA</option>
+                    <option value="CNAME">CNAME</option>
+                    <option value="MX">MX</option>
+                    <option value="NS">NS</option>
+                    <option value="TXT">TXT</option>
+                </select>
+            </div>
+            <button type="submit">Query</button>
+        </form>
+        <div id="query-result"></div>
+    </article>
+
+    <!-- Quick Actions -->
+    <article class="card">
+        <h3>Quick Actions</h3>
+        <div class="btn-group">
+            <form hx-post="/htmx/service/control" hx-target="#action-result" style="display:inline;">
+                <input type="hidden" name="resolver" value="coredns">
+                <input type="hidden" name="action" value="reload">
+                <button type="submit" class="btn-sm secondary">Reload Config</button>
+            </form>
+            <form hx-post="/htmx/cache/flush" hx-target="#action-result" style="display:inline;">
+                <input type="hidden" name="resolver" value="coredns">
+                <button type="submit" class="btn-sm secondary">Flush Cache</button>
+            </form>
+        </div>
+        <div id="action-result" style="margin-top: 1rem;"></div>
+    </article>
+</div>
+{% endblock %}

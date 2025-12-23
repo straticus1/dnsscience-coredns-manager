@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Service Management - DNS Science Admin{% endblock %}
+
+{% block content %}
+<h1>Service Management</h1>
+
+<div class="resolver-tabs">
+    <button class="resolver-tab active" onclick="setResolver('coredns')">CoreDNS</button>
+    <button class="resolver-tab" onclick="setResolver('unbound')">Unbound</button>
+</div>
+
+<div class="grid-2">
+    <!-- Status -->
+    <article class="card">
+        <h3>Service Status</h3>
+        <div
+            id="service-status"
+            hx-get="/htmx/service/status?resolver=coredns"
+            hx-trigger="load, every 5s, resolver-changed from:body"
+        >
+            <p class="htmx-indicator">Loading...</p>
+        </div>
+    </article>
+
+    <!-- Controls -->
+    <article class="card">
+        <h3>Service Control</h3>
+        <div class="btn-group">
+            <form hx-post="/htmx/service/control" hx-target="#service-status">
+                <input type="hidden" name="resolver" value="coredns">
+                <input type="hidden" name="action" value="start">
+                <button type="submit" class="btn-sm">Start</button>
+            </form>
+            <form hx-post="/htmx/service/control" hx-target="#service-status">
+                <input type="hidden" name="resolver" value="coredns">
+                <input type="hidden" name="action" value="stop">
+                <button type="submit" class="btn-sm secondary">Stop</button>
+            </form>
+            <form hx-post="/htmx/service/control" hx-target="#service-status">
+                <input type="hidden" name="resolver" value="coredns">
+                <input type="hidden" name="action" value="restart">
+                <button type="submit" class="btn-sm contrast">Restart</button>
+            </form>
+            <form hx-post="/htmx/service/control" hx-target="#service-status">
+                <input type="hidden" name="resolver" value="coredns">
+                <input type="hidden" name="action" value="reload">
+                <button type="submit" class="btn-sm outline">Reload</button>
+            </form>
+        </div>
+    </article>
+</div>
+
+<div class="grid-2" style="margin-top: 1rem;">
+    <!-- Health -->
+    <article class="card">
+        <h3>Health Details</h3>
+        <div
+            hx-get="/htmx/health/check?resolver=coredns"
+            hx-trigger="load, every 10s, resolver-changed from:body"
+        >
+            <p class="htmx-indicator">Loading...</p>
+        </div>
+    </article>
+
+    <!-- Metrics -->
+    <article class="card">
+        <h3>Key Metrics</h3>
+        <div
+            hx-get="/htmx/cache/stats?resolver=coredns"
+            hx-trigger="load, every 10s, resolver-changed from:body"
+        >
+            <p class="htmx-indicator">Loading...</p>
+        </div>
+    </article>
+</div>
+{% endblock %}

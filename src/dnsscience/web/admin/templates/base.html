@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DNS Science Admin{% endblock %}</title>
+
+    <!-- Pico CSS for minimal styling -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+
+    <!-- htmx -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+        }
+
+        .container {
+            max-width: 1400px;
+            padding: 1rem 2rem;
+        }
+
+        nav {
+            background: var(--card-background-color);
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav a {
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+        }
+
+        nav a:hover, nav a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            margin-right: 2rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .card {
+            background: var(--card-background-color);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--muted-border-color);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--muted-border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--muted-color);
+            font-size: 0.875rem;
+        }
+
+        .status-running { color: #22c55e; }
+        .status-stopped { color: #ef4444; }
+        .status-unknown { color: #eab308; }
+
+        .status-healthy { color: #22c55e; }
+        .status-unhealthy { color: #ef4444; }
+        .status-degraded { color: #eab308; }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: var(--code-background-color);
+            padding: 1rem;
+            border-radius: 0.25rem;
+            overflow-x: auto;
+            max-height: 400px;
+        }
+
+        table {
+            font-size: 0.875rem;
+        }
+
+        .resolver-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .resolver-tab {
+            padding: 0.5rem 1rem;
+            background: var(--secondary-background);
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+
+        .resolver-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .htmx-indicator {
+            display: none;
+        }
+
+        .htmx-request .htmx-indicator {
+            display: inline-block;
+        }
+
+        .loading {
+            opacity: 0.5;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        .alert-warning {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid #eab308;
+            color: #eab308;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/" class="logo">DNS Science</a></li>
+            <li><a href="/" {% if request.url.path == "/" %}class="active"{% endif %}>Dashboard</a></li>
+            <li><a href="/service" {% if request.url.path == "/service" %}class="active"{% endif %}>Service</a></li>
+            <li><a href="/cache" {% if request.url.path == "/cache" %}class="active"{% endif %}>Cache</a></li>
+            <li><a href="/query" {% if request.url.path == "/query" %}class="active"{% endif %}>Query</a></li>
+            <li><a href="/config" {% if request.url.path == "/config" %}class="active"{% endif %}>Config</a></li>
+            <li><a href="/compare" {% if request.url.path == "/compare" %}class="active"{% endif %}>Compare</a></li>
+            <li><a href="/migrate" {% if request.url.path == "/migrate" %}class="active"{% endif %}>Migrate</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        // Global htmx config
+        document.body.addEventListener('htmx:beforeRequest', function(evt) {
+            evt.detail.target.classList.add('loading');
+        });
+
+        document.body.addEventListener('htmx:afterRequest', function(evt) {
+            evt.detail.target.classList.remove('loading');
+        });
+
+        // Resolver tab switching
+        function setResolver(resolver) {
+            document.querySelectorAll('.resolver-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update all htmx elements with new resolver
+            document.querySelectorAll('[hx-get], [hx-post]').forEach(el => {
+                const url = el.getAttribute('hx-get') || el.getAttribute('hx-post');
+                if (url) {
+                    const newUrl = url.replace(/resolver=(coredns|unbound)/, `resolver=${resolver}`);
+                    if (el.hasAttribute('hx-get')) {
+                        el.setAttribute('hx-get', newUrl);
+                    } else {
+                        el.setAttribute('hx-post', newUrl);
+                    }
+                }
+            });
+
+            // Trigger refresh
+            htmx.trigger(document.body, 'resolver-changed');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<table>
+    <tr>
+        <td>State</td>
+        <td class="status-{{ status.state.value }}">
+            <strong>{{ status.state.value | upper }}</strong>
+        </td>
+    </tr>
+    <tr>
+        <td>Version</td>
+        <td>{{ status.version or 'Unknown' }}</td>
+    </tr>
+    <tr>
+        <td>Config Path</td>
+        <td><code>{{ status.config_path or 'Unknown' }}</code></td>
+    </tr>
+    <tr>
+        <td>Listening</td>
+        <td>{{ status.listening_addresses | join(', ') or 'None' }}</td>
+    </tr>
+    {% if status.uptime_seconds %}
+    <tr>
+        <td>Uptime</td>
+        <td>{{ (status.uptime_seconds // 3600) }}h {{ ((status.uptime_seconds % 3600) // 60) }}m</td>
+    </tr>
+    {% endif %}
+</table>
+
+{% if result %}
+<div class="alert {% if result.success %}alert-success{% else %}alert-error{% endif %}">
+    {{ result.message }}
+</div>
+{% endif %}

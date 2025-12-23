@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}DNS Query - DNS Science Admin{% endblock %}
+
+{% block content %}
+<h1>DNS Query</h1>
+
+<div class="resolver-tabs">
+    <button class="resolver-tab active" onclick="setResolver('coredns')">CoreDNS</button>
+    <button class="resolver-tab" onclick="setResolver('unbound')">Unbound</button>
+</div>
+
+<div class="grid-2">
+    <!-- Query Form -->
+    <article class="card">
+        <h3>DNS Lookup</h3>
+        <form hx-post="/htmx/query/lookup" hx-target="#query-result">
+            <input type="hidden" name="resolver" value="coredns" id="resolver-input">
+
+            <label for="domain">Domain</label>
+            <input type="text" id="domain" name="domain" placeholder="example.com" required>
+
+            <label for="record_type">Record Type</label>
+            <select id="record_type" name="record_type">
+                <option value="A">A - IPv4 Address</option>
+                <option value="AAAA">AAAA - IPv6 Address</option>
+                <option value="CNAME">CNAME - Canonical Name</option>
+                <option value="MX">MX - Mail Exchange</option>
+                <option value="NS">NS - Name Server</option>
+                <option value="TXT">TXT - Text Record</option>
+                <option value="SOA">SOA - Start of Authority</option>
+                <option value="PTR">PTR - Pointer Record</option>
+                <option value="SRV">SRV - Service Record</option>
+            </select>
+
+            <button type="submit">Query</button>
+        </form>
+    </article>
+
+    <!-- Results -->
+    <article class="card">
+        <h3>Query Result</h3>
+        <div id="query-result">
+            <p class="muted">Submit a query to see results</p>
+        </div>
+    </article>
+</div>
+
+<!-- Bulk Query -->
+<article class="card" style="margin-top: 1rem;">
+    <h3>Bulk Query</h3>
+    <form hx-post="/htmx/query/bulk" hx-target="#bulk-result">
+        <input type="hidden" name="resolver" value="coredns">
+
+        <label for="domains">Domains (one per line)</label>
+        <textarea id="domains" name="domains" rows="5" placeholder="google.com
+cloudflare.com
+github.com
+example.com"></textarea>
+
+        <div class="grid-2">
+            <div>
+                <label for="bulk_record_type">Record Type</label>
+                <select id="bulk_record_type" name="record_type">
+                    <option value="A">A</option>
+                    <option value="AAAA">AAAA</option>
+                    <option value="MX">MX</option>
+                </select>
+            </div>
+            <div>
+                <button type="submit" style="margin-top: 1.75rem;">Run Bulk Query</button>
+            </div>
+        </div>
+    </form>
+    <div id="bulk-result" style="margin-top: 1rem;"></div>
+</article>
+{% endblock %}

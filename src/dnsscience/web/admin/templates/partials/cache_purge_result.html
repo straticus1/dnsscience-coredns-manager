@@ -1,0 +1,13 @@
+{% if result.purged_count > 0 %}
+<div class="alert alert-success">
+    ✓ Purged {{ result.purged_count }} cache entries for {{ domain }}
+</div>
+{% elif result.purged_count == -1 %}
+<div class="alert alert-success">
+    ✓ Purge command sent for {{ domain }}
+</div>
+{% else %}
+<div class="alert alert-warning">
+    No entries found for {{ domain }} (or purge not supported)
+</div>
+{% endif %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Migration - DNS Science Admin{% endblock %}
+
+{% block content %}
+<h1>DNS Resolver Migration</h1>
+
+<div class="grid-2">
+    <!-- Migration Direction -->
+    <article class="card">
+        <h3>Migration Plan</h3>
+        <form hx-post="/htmx/migrate/plan" hx-target="#migration-result">
+            <label for="source">Source Resolver</label>
+            <select id="source" name="source">
+                <option value="coredns">CoreDNS</option>
+                <option value="unbound">Unbound</option>
+            </select>
+
+            <label for="target">Target Resolver</label>
+            <select id="target" name="target">
+                <option value="unbound">Unbound</option>
+                <option value="coredns">CoreDNS</option>
+            </select>
+
+            <label for="config">Source Configuration</label>
+            <textarea id="config" name="config" rows="10" placeholder="Paste source configuration here..."></textarea>
+
+            <button type="submit">Generate Migration Plan</button>
+        </form>
+    </article>
+
+    <!-- Results -->
+    <article class="card">
+        <h3>Migration Result</h3>
+        <div id="migration-result">
+            <p class="muted">Generate a migration plan to see results</p>
+        </div>
+    </article>
+</div>
+
+<!-- Validation -->
+<article class="card" style="margin-top: 1rem;">
+    <h3>Migration Validation</h3>
+    <p>After migration, validate both resolvers return equivalent responses:</p>
+
+    <form hx-post="/htmx/migrate/validate" hx-target="#validation-result">
+        <label for="domains">Test Domains (one per line)</label>
+        <textarea id="domains" name="domains" rows="5" placeholder="google.com
+cloudflare.com
+example.com
+github.com
+amazon.com"></textarea>
+
+        <button type="submit">Run Validation</button>
+    </form>
+    <div id="validation-result" style="margin-top: 1rem;"></div>
+</article>
+{% endblock %}

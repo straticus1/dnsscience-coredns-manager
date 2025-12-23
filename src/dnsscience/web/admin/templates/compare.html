@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Compare - DNS Science Admin{% endblock %}
+
+{% block content %}
+<h1>Resolver Comparison</h1>
+
+<div class="grid-2">
+    <!-- Single Compare -->
+    <article class="card">
+        <h3>Compare Single Query</h3>
+        <form hx-post="/htmx/compare/single" hx-target="#compare-result">
+            <label for="domain">Domain</label>
+            <input type="text" id="domain" name="domain" placeholder="example.com" required>
+
+            <label for="record_type">Record Type</label>
+            <select id="record_type" name="record_type">
+                <option value="A">A</option>
+                <option value="AAAA">AAAA</option>
+                <option value="MX">MX</option>
+                <option value="NS">NS</option>
+            </select>
+
+            <button type="submit">Compare</button>
+        </form>
+    </article>
+
+    <!-- Results -->
+    <article class="card">
+        <h3>Comparison Result</h3>
+        <div id="compare-result">
+            <p class="muted">Run a comparison to see results</p>
+        </div>
+    </article>
+</div>
+
+<!-- Bulk Compare -->
+<article class="card" style="margin-top: 1rem;">
+    <h3>Bulk Comparison</h3>
+    <form hx-post="/htmx/compare/bulk" hx-target="#bulk-compare-result">
+        <div class="grid-2">
+            <div>
+                <label for="domains">Domains (one per line)</label>
+                <textarea id="domains" name="domains" rows="8" placeholder="google.com
+cloudflare.com
+amazon.com
+github.com
+microsoft.com"></textarea>
+            </div>
+            <div>
+                <label for="bulk_record_type">Record Type</label>
+                <select id="bulk_record_type" name="record_type">
+                    <option value="A">A</option>
+                    <option value="AAAA">AAAA</option>
+                </select>
+
+                <button type="submit" style="margin-top: 1rem;">Run Bulk Comparison</button>
+            </div>
+        </div>
+    </form>
+    <div id="bulk-compare-result" style="margin-top: 1rem;"></div>
+</article>
+
+<!-- Shadow Mode -->
+<article class="card" style="margin-top: 1rem;">
+    <h3>Shadow Mode</h3>
+    <p>Run both resolvers in parallel to compare real traffic:</p>
+
+    <div class="grid-3">
+        <div>
+            <label for="sample_rate">Sample Rate</label>
+            <input type="number" id="sample_rate" name="sample_rate" value="1.0" min="0" max="1" step="0.1">
+        </div>
+        <div>
+            <label for="duration">Duration (seconds)</label>
+            <input type="number" id="duration" name="duration" value="300" min="60">
+        </div>
+        <div>
+            <label for="threshold">Alert Threshold</label>
+            <input type="number" id="threshold" name="threshold" value="0.01" min="0" max="1" step="0.01">
+        </div>
+    </div>
+
+    <div class="btn-group" style="margin-top: 1rem;">
+        <button hx-post="/htmx/compare/shadow/start" hx-target="#shadow-result">Start Shadow Mode</button>
+        <button hx-post="/htmx/compare/shadow/stop" hx-target="#shadow-result" class="secondary">Stop</button>
+        <button hx-get="/htmx/compare/shadow/report" hx-target="#shadow-result" class="outline">Get Report</button>
+    </div>
+    <div id="shadow-result" style="margin-top: 1rem;"></div>
+</article>
+{% endblock %}

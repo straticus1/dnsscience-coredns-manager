@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Cache Management - DNS Science Admin{% endblock %}
+
+{% block content %}
+<h1>Cache Management</h1>
+
+<div class="resolver-tabs">
+    <button class="resolver-tab active" onclick="setResolver('coredns')">CoreDNS</button>
+    <button class="resolver-tab" onclick="setResolver('unbound')">Unbound</button>
+</div>
+
+<div class="grid-2">
+    <!-- Cache Stats -->
+    <article class="card">
+        <h3>Cache Statistics</h3>
+        <div
+            id="cache-stats"
+            hx-get="/htmx/cache/stats?resolver=coredns"
+            hx-trigger="load, every 10s, resolver-changed from:body"
+        >
+            <p class="htmx-indicator">Loading...</p>
+        </div>
+
+        <div class="btn-group" style="margin-top: 1rem;">
+            <form hx-post="/htmx/cache/flush" hx-target="#cache-stats">
+                <input type="hidden" name="resolver" value="coredns">
+                <button type="submit" class="btn-sm contrast"
+                    onclick="return confirm('Are you sure you want to flush the entire cache?')">
+                    Flush All Cache
+                </button>
+            </form>
+        </div>
+    </article>
+
+    <!-- Purge Domain -->
+    <article class="card">
+        <h3>Purge Domain</h3>
+        <form hx-post="/htmx/cache/purge" hx-target="#purge-result">
+            <input type="hidden" name="resolver" value="coredns">
+
+            <label for="domain">Domain to Purge</label>
+            <input type="text" id="domain" name="domain" placeholder="example.com" required>
+
+            <button type="submit">Purge from Cache</button>
+        </form>
+        <div id="purge-result" style="margin-top: 1rem;"></div>
+    </article>
+</div>
+
+<!-- Cache Entries (if available) -->
+<article class="card" style="margin-top: 1rem;">
+    <h3>Cache Entries</h3>
+    <p class="muted">
+        Note: CoreDNS does not expose cache entries directly.
+        Unbound supports cache inspection via unbound-control dump_cache.
+    </p>
+</article>
+{% endblock %}
