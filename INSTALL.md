@@ -13,8 +13,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/afterdarksystems/dnsscience-toolkit.git
-cd dnsscience-toolkit
+git clone https://github.com/straticus1/dnsscience-coredns.git
+cd dnsscience-coredns
 
 # Create virtual environment
 python -m venv .venv
@@ -28,7 +28,7 @@ pip install -e ".[dev]"
 ### Option 2: Install from PyPI (Coming Soon)
 
 ```bash
-pip install dnsscience-toolkit
+pip install dnsscience-coredns
 ```
 
 ### Option 3: Using uv (Recommended)
@@ -101,8 +101,8 @@ This starts:
 ### Running the Toolkit in Docker
 
 ```bash
-docker build -t dnsscience-toolkit .
-docker run -it dnsscience-toolkit dnsctl --help
+docker build -t dnsscience-coredns .
+docker run -it dnsscience-coredns dnsctl --help
 ```
 
 ## Kubernetes Installation
@@ -115,7 +115,7 @@ docker run -it dnsscience-toolkit dnsctl --help
 # helm repo update
 
 # Install from local chart
-helm install dnsscience ./k8s/helm/dnsscience-toolkit \
+helm install dnsscience ./k8s/helm/dnsscience \
   --namespace dns-system \
   --create-namespace \
   --values your-values.yaml
@@ -253,14 +253,14 @@ git pull
 pip install -e ".[dev]"
 
 # From PyPI
-pip install --upgrade dnsscience-toolkit
+pip install --upgrade dnsscience-coredns
 ```
 
 ## Uninstalling
 
 ```bash
 # Remove package
-pip uninstall dnsscience-toolkit
+pip uninstall dnsscience-coredns
 
 # Remove configuration
 rm -rf ~/.config/dnsscience
