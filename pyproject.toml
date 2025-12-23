@@ -1,5 +1,5 @@
 [project]
-name = "dnsscience-coredns"
+name = "dnsscience-coredns-manager"
 version = "0.1.0"
 description = "Enterprise CoreDNS management toolkit with Unbound migration support"
 readme = "README.md"
@@ -77,10 +77,10 @@ dnsctl-api = "dnsscience.api.main:run"
 dnsctl-mcp = "dnsscience.mcp.server:run"
 
 [project.urls]
-Homepage = "https://github.com/straticus1/dnsscience-coredns"
-Documentation = "https://docs.dnsscience.io/coredns"
-Repository = "https://github.com/straticus1/dnsscience-coredns"
-Issues = "https://github.com/straticus1/dnsscience-coredns/issues"
+Homepage = "https://github.com/straticus1/dnsscience-coredns-manager"
+Documentation = "https://docs.dnsscience.io/coredns-manager"
+Repository = "https://github.com/straticus1/dnsscience-coredns-manager"
+Issues = "https://github.com/straticus1/dnsscience-coredns-manager/issues"
 
 [build-system]
 requires = ["hatchling"]

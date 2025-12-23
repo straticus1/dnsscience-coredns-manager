@@ -13,8 +13,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/straticus1/dnsscience-coredns.git
-cd dnsscience-coredns
+git clone https://github.com/straticus1/dnsscience-coredns-manager.git
+cd dnsscience-coredns-manager
 
 # Create virtual environment
 python -m venv .venv
@@ -28,7 +28,7 @@ pip install -e ".[dev]"
 ### Option 2: Install from PyPI (Coming Soon)
 
 ```bash
-pip install dnsscience-coredns
+pip install dnsscience-coredns-manager
 ```
 
 ### Option 3: Using uv (Recommended)
@@ -101,8 +101,8 @@ This starts:
 ### Running the Toolkit in Docker
 
 ```bash
-docker build -t dnsscience-coredns .
-docker run -it dnsscience-coredns dnsctl --help
+docker build -t dnsscience-coredns-manager .
+docker run -it dnsscience-coredns-manager dnsctl --help
 ```
 
 ## Kubernetes Installation

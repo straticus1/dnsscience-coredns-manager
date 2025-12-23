@@ -1,6 +1,6 @@
-# DNS Science Toolkit
+# DNS Science CoreDNS Manager
 
-**Enterprise-grade DNS resolver management for CoreDNS and Unbound**
+**Enterprise-grade CoreDNS management with Unbound migration support**
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
@@ -10,7 +10,7 @@
 
 ## Overview
 
-DNS Science Toolkit is a unified control plane for managing DNS resolvers in Kubernetes and standalone environments. Built for system administrators and DevOps engineers who need reliable, observable DNS infrastructure.
+DNS Science CoreDNS Manager is a unified control plane for managing DNS resolvers in Kubernetes and standalone environments. Built for system administrators and DevOps engineers who need reliable, observable DNS infrastructure.
 
 ### Key Features
 
@@ -45,7 +45,7 @@ See [INSTALL.md](INSTALL.md) for detailed installation instructions.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                         DNS Science Toolkit                          │
+│                    DNS Science CoreDNS Manager                       │
 ├────────┬──────────────┬─────────────┬────────────┬──────────┬───────┤
 │  CLI   │   REST API   │  MCP Server │  n8n Nodes │  Web UI  │ Admin │
 │ (Typer)│   (FastAPI)  │  (MCP SDK)  │  (Custom)  │ (React)  │(htmx) │
@@ -125,7 +125,7 @@ Includes CoreDNS, Unbound, Prometheus, and Grafana.
 ### Kubernetes (Production)
 
 ```bash
-helm install dnsscience ./k8s/helm/dnsscience-toolkit \
+helm install dnsscience ./k8s/helm/dnsscience \
   --namespace dns-system \
   --create-namespace
 ```
